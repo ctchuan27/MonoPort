@@ -1,0 +1,7 @@
+######implicit_seg error######
+/home/enjhih/anaconda3/envs/MonoPort/lib/python3.9/site-packages/implicit_seg/functional/seg3d_lossless.py, line 181:
+#solution: +.type(torch.long)
+=> is_boundary[coords_accum[0, :, 2].type(torch.long),
+                                coords_accum[0, :, 1].type(torch.long), 
+                                coords_accum[0, :, 0].type(torch.long)] = False
+########################################################################################################################

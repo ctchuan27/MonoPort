@@ -12,12 +12,14 @@ import multiprocessing as python_multiprocessing
 import torch
 import torch.multiprocessing as multiprocessing
 from torch._utils import ExceptionWrapper
-from torch._six import queue, string_classes
+#from torch._six import queue, string_classes
+import queue
+
 
 from torch.utils.data import IterableDataset, Sampler, SequentialSampler, RandomSampler, BatchSampler
 from torch.utils.data import _utils
 
-
+string_classes=str
 get_worker_info = _utils.worker.get_worker_info
 
 # This function used to be defined in this file. However, it was moved to
@@ -1019,7 +1021,9 @@ static methods.
 """
 
 import torch
-from torch._six import queue, container_abcs, string_classes
+#from torch._six import queue, container_abcs, string_classes
+import queue
+import collections.abc as container_abcs
 from torch._utils import ExceptionWrapper
 MP_STATUS_CHECK_INTERVAL = 5.0
 

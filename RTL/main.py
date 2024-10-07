@@ -42,7 +42,7 @@ DESKTOP_MODE = 'TEXTURE_NORM'
 SERVER_MODE = 'TEXTURE'
 # assert SERVER_MODE in ['NORM', 'TEXTURE']
 
-VIEW_MODE = 'AUTO'
+VIEW_MODE = 'FRONT'
 # assert VIEW_MODE in ['FRONT', 'BACK', 'LEFT', 'RIGHT', 'AUTO', 'LOAD']
 
 ########################################
@@ -211,6 +211,7 @@ mat_color = mat.to(cuda_color)
 
 @torch.no_grad()
 def colorization(netC, feat_tensor_C, X, Y, Z, calib_tensor, norm=None):
+    #print('in')
     if X is None:
         return None
 
@@ -246,6 +247,7 @@ def colorization(netC, feat_tensor_C, X, Y, Z, calib_tensor, norm=None):
     
         image = canvas.clone()
         image[X, Y, :] = color
+        
         return image
 
 
@@ -516,6 +518,7 @@ def main_loop():
                 ])) # RGB
         elif DESKTOP_MODE == 'TEXTURE_NORM':
             if render_tex is None:
+                print("render_tex is None")
                 render_tex = np.ones((256, 256, 3), dtype=np.float32) * 255
             if render_norm is None:
                 render_norm = np.ones((256, 256, 3), dtype=np.float32) * 255
