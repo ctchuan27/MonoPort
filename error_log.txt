@@ -5,3 +5,29 @@
                                 coords_accum[0, :, 1].type(torch.long), 
                                 coords_accum[0, :, 0].type(torch.long)] = False
 ########################################################################################################################
+
+#######pin memory error#######
+RuntimeError: Pin memory thread exited unexpectedly
+
+1.TypeError: _worker_loop() missing 2 required positional arguments: 'persistent_workers' and 'shared_seed'
+/home/robot-4090-3/miniconda3/envs/ee-cv-tunchuan/lib/python3.9/multiprocessing/process.py", line 108:
+#solution: + persistent_workers, shared_seed
+=> self._target(*self._args, **self._kwargs, persistent_workers=0, shared_seed=False)
+
+2.TypeError: _pin_memory_loop() missing 1 required positional argument: 'device'
+File "/home/robot-4090-3/miniconda3/envs/ee-cv-tunchuan/lib/python3.9/threading.py", line 917, in run:
+self._target(*self._args, **self._kwargs)
+#solution: at RTL/main.py , set pin_memory to False
+=> pin_memory=False
+
+success setting:
+loader = DataLoader(
+    data_stream, 
+    batch_size=1, 
+    num_workers=1, 
+    pin_memory=False,
+    processors=processors,
+)
+
+if set num_workers to 0, will cause error of indices
+########################################################################################################################
