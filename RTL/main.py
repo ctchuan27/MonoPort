@@ -32,11 +32,16 @@ from dataloader import DataLoader
 from scene import MonoPortScene, make_rotate
 from recon import pifu_calib, forward_vertices
 
+from Superresolution.inference import enhance_image 
+import tensorflow as tf
+
+
+
 
 ########################################
 ## Global Control
 ########################################
-DESKTOP_MODE = 'TEXTURE_NORM'
+DESKTOP_MODE = 'TEXTURE'
 # assert DESKTOP_MODE in ['SEGM', 'NORM', 'TEXTURE', 'TEXTURE_NORM']
 
 SERVER_MODE = 'TEXTURE'
@@ -85,11 +90,13 @@ cfg.freeze()
 ## access avaiable GPUs
 ########################################
 device_count = torch.cuda.device_count()
+
 if device_count == 1:
     cuda_backbone_G='cuda:0' 
     cuda_backbone_C='cuda:0'
     cuda_recon='cuda:0'
     cuda_color='cuda:0'
+    print("#use cuda 0")
 elif device_count == 2:
     cuda_backbone_G='cuda:1' 
     cuda_backbone_C='cuda:1'
@@ -470,7 +477,7 @@ def main_loop():
     global DESKTOP_MODE, SERVER_MODE, VIEW_MODE
 
     window_server = np.ones((256, 256, 3), dtype=np.uint8) * 255
-    window_desktop = np.ones((512, 1024, 3), dtype=np.uint8) * 255
+    window_desktop = np.ones((2048, 4096, 3), dtype=np.uint8) * 255
 
     create_opengl_context(256, 256)
     renderer = AlbedoRender(width=256, height=256, multi_sample_rate=1)
@@ -512,10 +519,17 @@ def main_loop():
         elif DESKTOP_MODE == 'TEXTURE':
             if render_tex is None:
                 render_tex = np.ones((256, 256, 3), dtype=np.float32) * 255
+            segmentation = (input4c[:, :, 0:3] * input4c[:, :, 3:4] * 0.5) + 0.5
+            sr_image=enhance_image(lr_image=tf.convert_to_tensor(render_tex, dtype=tf.float32), visualize=False,sr_path='output/test.jpg')
             window_desktop = np.uint8(np.hstack([
-                input * 255, 
-                cv2.resize(render_tex, (512, 512))
+                #input * 255, 
+                #cv2.resize(sr_image, (512, 512))
+                cv2.resize(input * 255, (1024, 1024)),
+                cv2.resize(segmentation * 255, (1024, 1024)),
+                cv2.resize(render_tex, (1024, 1024)),
+                sr_image
                 ])) # RGB
+            #print("input: ",input.shape," ,render_tex:", render_tex.shape)
         elif DESKTOP_MODE == 'TEXTURE_NORM':
             if render_tex is None:
                 print("render_tex is None")
